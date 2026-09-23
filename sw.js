@@ -1,7 +1,6 @@
-sw.js
 "use strict";
 
-const CACHE_NAME = "uniplan-static-v5.0.0";
+const CACHE_NAME = "uniplan-static-v6.0.0";
 
 const CORE_FILES = [
     "./",
