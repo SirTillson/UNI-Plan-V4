@@ -1048,8 +1048,17 @@ summary {
             </div>
         </div>
 
-        <label for="exam-weight">Gewichtung an der Endnote (%)</label>
-        <input id="exam-weight" type="number" min="0" max="100" value="100">
+                <div class="grid-2">
+            <div>
+                <label for="exam-weight">Gewichtung Modulnote (%)</label>
+                <input id="exam-weight" type="number" min="0" max="100" value="100">
+            </div>
+            <div>
+                <label for="exam-ects">ECTS des Moduls</label>
+                <input id="exam-ects" type="number" min="0" max="60" step="1"
+                       value="0" placeholder="0 = unbekannt">
+            </div>
+        </div>
 
         <label for="exam-grade">Erzielte Note (optional, 1,0–5,0)</label>
         <input id="exam-grade" type="number" min="1" max="5" step="0.1"
@@ -1081,7 +1090,36 @@ summary {
         </div>
     </div>
 </div>
+      
+<div id="import-dialog" class="modal-bg">
+    <div class="modal" style="max-width:350px">
+        <div style="font-size:32px;text-align:center">📥</div>
+        <h3 style="text-align:center">Backup importieren</h3>
 
+        <p id="import-summary"
+           style="margin:8px 0 4px;color:var(--muted);font-size:13px;
+                  line-height:1.45;text-align:center"></p>
+
+        <div style="display:grid;gap:8px;margin-top:16px">
+            <button id="import-merge" class="btn primary" type="button">
+                Zusammenführen
+            </button>
+            <button id="import-replace" class="btn danger" type="button">
+                Alles ersetzen
+            </button>
+            <button id="import-cancel" class="btn" type="button">
+                Abbrechen
+            </button>
+        </div>
+
+        <p style="margin-top:12px;color:var(--muted);font-size:11px;
+                  line-height:1.4;text-align:center">
+            Beim Zusammenführen bleiben deine aktuellen Einträge erhalten.
+            Gleiche Einträge werden durch die neueren ersetzt.
+        </p>
+    </div>
+</div>
+      
 <datalist id="course-list"></datalist>
 
 <div id="toast" class="toast"></div>
@@ -1275,6 +1313,7 @@ function normalizeData(raw) {
             time: String(item.time || "09:00"),
             room: String(item.room || ""),
             weight: Math.max(0, Number(item.weight) || 100),
+            ects: Math.max(0, Number(item.ects) || 0),
             prepWeeks: Math.max(1, Number(item.prepWeeks || item.prep_weeks) || 4),
             prepHours: Math.max(
                 1,
@@ -1665,6 +1704,19 @@ function sessionHasConflict(session) {
     });
 }
 
+function duplicateSession(id) {
+    const original = state.sessions.find(item => item.id === id);
+    if (!original) return;
+
+    const copy = { ...original, id: uid() };
+    state.sessions.push(copy);
+
+    saveData();
+    renderAll();
+    openSessionModal(copy.id);
+    showToast("Kopie erstellt – jetzt anpassen");
+}
+      
 function sessionCard(session) {
     const conflict = sessionHasConflict(session);
     const color = courseColor(session.course);
@@ -1693,7 +1745,14 @@ function sessionCard(session) {
                             : ""}
                     </div>
                 </div>
-
+                
+                <button class="mini-btn"
+                            type="button"
+                            aria-label="Termin duplizieren"
+                            onclick="duplicateSession('${session.id}')">
+                        ⧉
+                    </button>
+                    
                 <div class="item-actions">
                     <button class="mini-btn edit"
                             type="button"
@@ -2105,7 +2164,10 @@ function openExamModal(id = null) {
 
     document.getElementById("exam-weight").value =
         exam ? exam.weight : 100;
-
+      
+    document.getElementById("exam-ects").value =
+        exam ? exam.ects : 0;
+      
     document.getElementById("exam-grade").value =
         exam && exam.grade !== null && exam.grade !== undefined
             ? exam.grade
@@ -2142,6 +2204,10 @@ function saveExam() {
         weight: Math.max(
             0,
             Number(document.getElementById("exam-weight").value) || 100
+        ),
+        ects: Math.max(
+            0,
+            Number(document.getElementById("exam-ects").value) || 0
         ),
         grade: parseOptionalGrade(
             document.getElementById("exam-grade").value
@@ -2304,66 +2370,75 @@ function renderExams() {
           `;
 }
 
+function examGradeWeight(exam) {
+    const ects = Number(exam.ects) || 0;
+    const factor = ects > 0 ? ects : 1;
+    return factor * (Number(exam.weight) || 0) / 100;
+}
+
 function calculateGradeOverview() {
     const perCourse = {};
+    let overallWeighted = 0;
+    let overallWeight = 0;
+    let usesEcts = false;
 
     state.exams.forEach(exam => {
         const course = exam.course || "Unbekannt";
 
         if (!perCourse[course]) {
             perCourse[course] = {
-                gradedWeightSum: 0,
-                gradedWeightedGrade: 0,
-                totalWeight: 0,
+                weighted: 0,
+                weight: 0,
+                percentSum: 0,
                 gradedCount: 0,
-                examCount: 0
+                examCount: 0,
+                ects: 0
             };
         }
 
         const entry = perCourse[course];
-        entry.totalWeight += exam.weight;
         entry.examCount += 1;
+        entry.percentSum += Number(exam.weight) || 0;
+        entry.ects = Math.max(entry.ects, Number(exam.ects) || 0);
+
+        if ((Number(exam.ects) || 0) > 0) {
+            usesEcts = true;
+        }
 
         if (exam.grade !== null && exam.grade !== undefined) {
-            entry.gradedWeightSum += exam.weight;
-            entry.gradedWeightedGrade += exam.weight * exam.grade;
+            const weight = examGradeWeight(exam);
+            entry.weighted += weight * exam.grade;
+            entry.weight += weight;
             entry.gradedCount += 1;
+            overallWeighted += weight * exam.grade;
+            overallWeight += weight;
         }
     });
 
     const rows = Object.entries(perCourse)
         .map(([course, data]) => ({
             course,
-            average: data.gradedWeightSum > 0
-                ? data.gradedWeightedGrade / data.gradedWeightSum
-                : null,
-            totalWeight: data.totalWeight,
+            average: data.weight > 0 ? data.weighted / data.weight : null,
+            totalWeight: data.percentSum,
             gradedCount: data.gradedCount,
             examCount: data.examCount,
-            overWeighted: data.totalWeight > 100.5
+            ects: data.ects,
+            overWeighted: data.percentSum > 100.5
         }))
         .sort((a, b) => a.course.localeCompare(b.course, "de"));
 
-    let overallWeightedSum = 0;
-    let overallWeightTotal = 0;
-
-    state.exams.forEach(exam => {
-        if (exam.grade !== null && exam.grade !== undefined) {
-            overallWeightedSum += exam.weight * exam.grade;
-            overallWeightTotal += exam.weight;
-        }
-    });
-
-    const overallAverage = overallWeightTotal > 0
-        ? overallWeightedSum / overallWeightTotal
-        : null;
-
-    return { rows, overallAverage };
+    return {
+        rows,
+        overallAverage: overallWeight > 0
+            ? overallWeighted / overallWeight
+            : null,
+        usesEcts
+    };
 }
 
 function renderGradeOverview() {
     const container = document.getElementById("grade-overview");
-    const { rows, overallAverage } = calculateGradeOverview();
+    const { rows, overallAverage, usesEcts } = calculateGradeOverview();
 
     if (!rows.length) {
         container.innerHTML = `
@@ -2388,8 +2463,9 @@ function renderGradeOverview() {
                 </div>
                 <div class="item-sub" style="margin-top:6px">
                     Berechnet aus allen Klausuren mit eingetragener Note,
-                    gewichtet nach ihrer Prozentangabe. ECTS werden dabei
-                    nicht berücksichtigt.
+                    gewichtet nach ihrer Prozentangabe.                     ${usesEcts
+                        ? "Gewichtet nach ECTS und Prozentanteil."
+                        : "Gewichtet nach Prozentanteil. Trage ECTS ein für eine genauere Berechnung."}
                 </div>
             </div>
         `;
@@ -2414,6 +2490,7 @@ function renderGradeOverview() {
                         ${row.gradedCount} von ${row.examCount}
                         Klausuren benotet
                         · Gewichtung gesamt: ${row.totalWeight.toFixed(0)} %
+                                                ${row.ects > 0 ? ` · ${row.ects} ECTS` : ""}
                         ${row.overWeighted
                             ? " · ⚠️ Gewichtung über 100 %"
                             : ""}
@@ -2836,7 +2913,8 @@ function setTimerMode(minutes) {
     timer.endsAt = null;
     timer.todoId = null;
     timer.task = `${minutes} Minuten Fokus`;
-
+    timer.isBreak = false;
+      
     saveData();
     updateTimerDisplay();
 }
@@ -2888,7 +2966,8 @@ function resetTimer() {
     timer.endsAt = null;
     timer.todoId = null;
     timer.task = "Bereit für Fokus";
-
+    timer.isBreak = false;
+      
     saveData();
     updateTimerDisplay();
 }
@@ -2906,6 +2985,7 @@ function startTodoFocus(id) {
         endsAt: null,
         task: todo.title,
         todoId: todo.id
+        isBreak: false;
     };
 
     saveData();
@@ -2946,26 +3026,64 @@ function playCompletionSound() {
     }
 }
 
+function breakMinutesFor(focusMinutes) {
+    if (focusMinutes <= 30) return 5;
+    if (focusMinutes <= 60) return 10;
+    return 20;
+}
+
 function finishTimer() {
     const timer = state.focus.timer;
     if (timer.status !== "running") return;
 
-    const completedMinutes =
-        Math.max(1, Math.round(timer.durationSec / 60));
-
-    const today = localDateKey();
-
-    state.focus.log[today] =
-        Number(state.focus.log[today] || 0) + completedMinutes;
-
-    timer.status = "idle";
-    timer.remainingSec = timer.durationSec;
-    timer.endsAt = null;
+    const wasBreak = Boolean(timer.isBreak);
+    const minutes = Math.max(1, Math.round(timer.durationSec / 60));
 
     playCompletionSound();
+
+    if (wasBreak) {
+        const duration = Math.max(60, (timer.lastFocusMin || 25) * 60);
+
+        state.focus.timer = {
+            status: "idle",
+            durationSec: duration,
+            remainingSec: duration,
+            endsAt: null,
+            task: timer.lastTask || "Bereit für Fokus",
+            todoId: timer.todoId || null,
+            isBreak: false,
+            lastFocusMin: timer.lastFocusMin || 25,
+            lastTask: timer.lastTask || ""
+        };
+
+        saveData();
+        renderAll();
+        showToast("Pause vorbei – weiter geht’s");
+        return;
+    }
+
+    const today = localDateKey();
+    state.focus.log[today] =
+        Number(state.focus.log[today] || 0) + minutes;
+
+    const pause = breakMinutesFor(minutes);
+    const pauseSeconds = pause * 60;
+
+    state.focus.timer = {
+        status: "running",
+        durationSec: pauseSeconds,
+        remainingSec: pauseSeconds,
+        endsAt: Date.now() + pauseSeconds * 1000,
+        task: `☕ Pause (${pause} Min.)`,
+        todoId: timer.todoId || null,
+        isBreak: true,
+        lastFocusMin: minutes,
+        lastTask: timer.task || "Bereit für Fokus"
+    };
+
     saveData();
     renderAll();
-    showToast("🎉 Fokus-Session abgeschlossen");
+    showToast(`🎉 ${minutes} Min. geschafft – ${pause} Min. Pause läuft`);
 }
 
 function updateTimerDisplay() {
@@ -3214,6 +3332,66 @@ async function exportBackup() {
     }
 }
 
+function mergeIntoState(incoming) {
+    const report = { added: 0, updated: 0 };
+
+    ["sessions", "todos", "exams"].forEach(key => {
+        const index = new Map();
+
+        state[key].forEach((item, position) => {
+            index.set(item.id, position);
+        });
+
+        incoming[key].forEach(item => {
+            if (index.has(item.id)) {
+                state[key][index.get(item.id)] = item;
+                report.updated += 1;
+            } else {
+                state[key].push(item);
+                report.added += 1;
+            }
+        });
+    });
+
+    Object.entries(incoming.focus.log || {}).forEach(([day, minutes]) => {
+        const existing = Number(state.focus.log[day] || 0);
+        state.focus.log[day] = Math.max(existing, Number(minutes) || 0);
+    });
+
+    return report;
+}
+
+function askImportMode(incoming) {
+    return new Promise(resolve => {
+        const dialog = document.getElementById("import-dialog");
+
+        document.getElementById("import-summary").textContent =
+            `Gefunden: ${incoming.sessions.length} Termine, ` +
+            `${incoming.todos.length} Todos, ` +
+            `${incoming.exams.length} Klausuren.`;
+
+        const merge = document.getElementById("import-merge");
+        const replace = document.getElementById("import-replace");
+        const cancel = document.getElementById("import-cancel");
+
+        function finish(mode) {
+            dialog.classList.remove("show");
+            document.body.style.overflow = "";
+            merge.onclick = null;
+            replace.onclick = null;
+            cancel.onclick = null;
+            resolve(mode);
+        }
+
+        merge.onclick = () => finish("merge");
+        replace.onclick = () => finish("replace");
+        cancel.onclick = () => finish(null);
+
+        dialog.classList.add("show");
+        document.body.style.overflow = "hidden";
+    });
+}
+
 function importBackup() {
     const input = document.createElement("input");
     input.type = "file";
@@ -3223,31 +3401,42 @@ function importBackup() {
         const file = event.target.files[0];
         if (!file) return;
 
+        let incoming;
+
         try {
-            const text = await file.text();
-            const imported = JSON.parse(text);
-
-            if (!imported || typeof imported !== "object") {
-                throw new Error("Ungültige Daten");
-            }
-
-            const confirmed = await askUser(
-                "Backup importieren?",
-                "Der aktuelle Datenbestand wird durch die ausgewählte Datei ersetzt. Erstelle vorher bei Bedarf ein Backup.",
-                "Importieren",
-                "📥"
-            );
-
-            if (!confirmed) return;
-
-            state = normalizeData(imported);
-            saveData();
-            renderAll();
-            showToast("Backup erfolgreich importiert");
+            incoming = normalizeData(JSON.parse(await file.text()));
         } catch (error) {
             console.error(error);
             showToast("Die Datei ist kein gültiges UniPlan-Backup");
+            return;
         }
+
+        const mode = await askImportMode(incoming);
+        if (!mode) return;
+
+        if (mode === "merge") {
+            const report = mergeIntoState(incoming);
+            saveData();
+            renderAll();
+            showToast(
+                `${report.added} neu, ${report.updated} aktualisiert`
+            );
+            return;
+        }
+
+        const confirmed = await askUser(
+            "Wirklich alles ersetzen?",
+            "Deine aktuellen Termine, Todos und Klausuren werden vollständig überschrieben.",
+            "Ersetzen",
+            "⚠️"
+        );
+
+        if (!confirmed) return;
+
+        state = incoming;
+        saveData();
+        renderAll();
+        showToast("Daten ersetzt");
     };
 
     input.click();
