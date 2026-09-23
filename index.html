@@ -1487,6 +1487,7 @@ function closeModal(id) {
 
 document.querySelectorAll(".modal-bg").forEach(modal => {
     if (modal.id === "confirm-dialog") return;
+    if (modal.id === "import-dialog") return;
 
     modal.addEventListener("click", event => {
         if (event.target === modal) {
@@ -1745,15 +1746,15 @@ function sessionCard(session) {
                             : ""}
                     </div>
                 </div>
-                
-                <button class="mini-btn"
+
+                <div class="item-actions">
+                    <button class="mini-btn"
                             type="button"
                             aria-label="Termin duplizieren"
                             onclick="duplicateSession('${session.id}')">
                         ⧉
                     </button>
-                    
-                <div class="item-actions">
+
                     <button class="mini-btn edit"
                             type="button"
                             aria-label="Termin bearbeiten"
@@ -2461,11 +2462,12 @@ function renderGradeOverview() {
                         ${overallAverage.toFixed(2)}
                     </span>
                 </div>
-                <div class="item-sub" style="margin-top:6px">
-                    Berechnet aus allen Klausuren mit eingetragener Note,
-                    gewichtet nach ihrer Prozentangabe.                     ${usesEcts
-                        ? "Gewichtet nach ECTS und Prozentanteil."
-                        : "Gewichtet nach Prozentanteil. Trage ECTS ein für eine genauere Berechnung."}
+            <div class="item-sub" style="margin-top:6px">
+                    Berechnet aus allen Klausuren mit eingetragener Note${
+                        usesEcts
+                            ? ", gewichtet nach ECTS und Prozentanteil."
+                            : ". Trage ECTS ein für eine genauere Berechnung."
+                    }
                 </div>
             </div>
         `;
@@ -2490,10 +2492,8 @@ function renderGradeOverview() {
                         ${row.gradedCount} von ${row.examCount}
                         Klausuren benotet
                         · Gewichtung gesamt: ${row.totalWeight.toFixed(0)} %
-                                                ${row.ects > 0 ? ` · ${row.ects} ECTS` : ""}
-                        ${row.overWeighted
-                            ? " · ⚠️ Gewichtung über 100 %"
-                            : ""}
+                        ${row.ects > 0 ? ` · ${row.ects} ECTS` : ""}
+                        ${row.overWeighted ? " · ⚠️ Gewichtung über 100 %" : ""}
                     </div>
                 </div>
 
@@ -2984,8 +2984,8 @@ function startTodoFocus(id) {
         remainingSec: duration,
         endsAt: null,
         task: todo.title,
-        todoId: todo.id
-        isBreak: false;
+        todoId: todo.id,
+        isBreak: false
     };
 
     saveData();
