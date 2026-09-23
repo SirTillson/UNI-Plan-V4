@@ -1,0 +1,3461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="color-scheme" content="dark">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UniPlan">
+
+<title>UniPlan Pro</title>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+
+<style>
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #172033;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --blue: #3b82f6;
+    --indigo: #6366f1;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --shadow: 0 10px 30px rgba(0, 0, 0, .32);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    background: var(--bg);
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding-bottom: calc(82px + env(safe-area-inset-bottom));
+    background:
+        radial-gradient(circle at top right, rgba(59,130,246,.10), transparent 28rem),
+        var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+label {
+    display: block;
+    margin: 11px 0 5px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding:
+        calc(10px + env(safe-area-inset-top))
+        12px
+        10px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(15,23,42,.93);
+    backdrop-filter: blur(14px);
+}
+
+.brand {
+    min-width: 0;
+}
+
+.brand h1 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.2;
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.subtitle {
+    max-width: 210px;
+    margin-top: 3px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-actions {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+main {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 14px;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+    animation: fadeIn .18s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.page-head h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.card,
+.item {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(30,41,59,.94);
+    box-shadow: 0 4px 14px rgba(0,0,0,.10);
+}
+
+.card {
+    margin-bottom: 11px;
+    padding: 13px;
+}
+
+.item {
+    position: relative;
+    margin-bottom: 9px;
+    padding: 11px;
+    overflow: hidden;
+}
+
+.item-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.item-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.item-title {
+    overflow-wrap: anywhere;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.item-sub {
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.item-actions {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.section-title {
+    margin: 18px 0 7px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+}
+
+.section-title.danger {
+    color: #fca5a5;
+}
+
+.btn,
+.icon-btn,
+.mini-btn,
+.chip {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 650;
+}
+
+.btn {
+    gap: 6px;
+    padding: 9px 13px;
+    font-size: 13px;
+}
+
+.btn.primary {
+    border-color: var(--blue);
+    background: var(--blue);
+    color: white;
+}
+
+.btn.danger {
+    border-color: var(--red);
+    background: var(--red);
+    color: white;
+}
+
+.btn.full {
+    width: 100%;
+}
+
+.icon-btn {
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    font-size: 17px;
+}
+
+.mini-btn {
+    width: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 0;
+    background: var(--bg);
+    font-size: 15px;
+}
+
+.mini-btn.edit {
+    border-color: #1d4ed8;
+    color: #bfdbfe;
+}
+
+.mini-btn.delete {
+    border-color: #7f1d1d;
+    color: #fecaca;
+}
+
+.btn:active,
+.icon-btn:active,
+.mini-btn:active,
+.chip:active {
+    transform: scale(.95);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.row.between {
+    justify-content: space-between;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.badge.green {
+    background: rgba(16,185,129,.14);
+    color: #6ee7b7;
+}
+
+.badge.amber {
+    background: rgba(245,158,11,.14);
+    color: #fcd34d;
+}
+
+.badge.red {
+    background: rgba(239,68,68,.14);
+    color: #fca5a5;
+}
+
+.badge.blue {
+    background: rgba(59,130,246,.14);
+    color: #93c5fd;
+}
+
+.empty {
+    padding: 30px 12px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 13px;
+}
+
+.warning {
+    border-color: rgba(245,158,11,.55);
+    background: rgba(245,158,11,.08);
+}
+
+.danger-card {
+    border-color: rgba(239,68,68,.55);
+    background: rgba(239,68,68,.08);
+}
+
+.success-card {
+    border-color: rgba(16,185,129,.55);
+    background: rgba(16,185,129,.08);
+}
+
+.progress {
+    height: 8px;
+    margin-top: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #0b1220;
+}
+
+.progress > div {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--blue), var(--indigo));
+    transition: width .25s;
+}
+
+.checkbox {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    min-height: 22px;
+    margin: 1px 0 0;
+    accent-color: var(--blue);
+}
+
+.filters {
+    display: flex;
+    gap: 7px;
+    margin: 9px 0 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    min-height: 38px;
+    padding: 7px 12px;
+    white-space: nowrap;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.chip.active {
+    border-color: var(--blue);
+    background: rgba(59,130,246,.16);
+    color: #bfdbfe;
+}
+
+details {
+    margin-top: 9px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+}
+
+summary {
+    color: #c7d2fe;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.phase {
+    margin-top: 7px;
+    padding: 8px;
+    border-radius: 9px;
+    background: rgba(15,23,42,.65);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.timer-ring {
+    --progress: 0%;
+    display: grid;
+    width: 225px;
+    height: 225px;
+    margin: 20px auto;
+    padding: 7px;
+    place-items: center;
+    border-radius: 50%;
+    background:
+        conic-gradient(
+            var(--indigo) var(--progress),
+            rgba(99,102,241,.16) 0
+        );
+    box-shadow: var(--shadow);
+}
+
+.timer-inner {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 50%;
+    background: var(--card2);
+}
+
+#timer-display {
+    font-size: 43px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+}
+
+#timer-task {
+    max-width: 170px;
+    margin-top: 6px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chart {
+    display: flex;
+    height: 75px;
+    align-items: flex-end;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.chart-col {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    align-items: center;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.chart-bar {
+    width: 100%;
+    min-height: 3px;
+    border-radius: 4px 4px 2px 2px;
+    background: linear-gradient(180deg, #60a5fa, #4f46e5);
+}
+
+.chart-label {
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.stat-grid .item-sub {
+    margin-top: 0;
+}
+
+.stat-value {
+    margin-top: 3px;
+    font-size: 16px;
+    font-weight: 750;
+}
+
+.modal-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding:
+        calc(16px + env(safe-area-inset-top))
+        16px
+        calc(16px + env(safe-area-inset-bottom));
+    background: rgba(0,0,0,.68);
+    backdrop-filter: blur(5px);
+}
+
+.modal-bg.show {
+    display: flex;
+}
+
+.modal {
+    width: 100%;
+    max-width: 410px;
+    max-height: 92vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    padding: 17px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+}
+
+.modal h3 {
+    margin: 0 0 7px;
+    font-size: 17px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.modal-actions .btn {
+    flex: 1;
+}
+
+.toast {
+    position: fixed;
+    z-index: 220;
+    top: calc(14px + env(safe-area-inset-top));
+    left: 50%;
+    max-width: calc(100vw - 30px);
+    padding: 10px 15px;
+    border-radius: 11px;
+    background: var(--green);
+    color: #052e16;
+    box-shadow: var(--shadow);
+    font-size: 13px;
+    font-weight: 800;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -10px);
+    transition: .2s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.snackbar {
+    position: fixed;
+    z-index: 210;
+    right: 14px;
+    bottom: calc(90px + env(safe-area-inset-bottom));
+    left: 14px;
+    display: none;
+    max-width: 520px;
+    margin: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 11px 13px;
+    background: #111c30;
+    box-shadow: var(--shadow);
+}
+
+.snackbar.show {
+    display: flex;
+    animation: snackbarIn .2s;
+}
+
+@keyframes snackbarIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+}
+
+.bottom-nav {
+    position: fixed;
+    z-index: 60;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--border);
+    background: rgba(15,23,42,.96);
+    backdrop-filter: blur(14px);
+}
+
+.bottom-nav button {
+    min-height: 64px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.bottom-nav button.active {
+    color: #60a5fa;
+}
+
+.bottom-nav button span {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 19px;
+}
+
+.network {
+    color: #6ee7b7;
+}
+
+.network.offline {
+    color: #fcd34d;
+}
+
+@media (min-width: 650px) {
+    main {
+        padding-top: 22px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        <h1>UniPlan Pro</h1>
+        <div class="subtitle" id="top-subtitle">Wird geladen …</div>
+    </div>
+
+    <div class="header-actions">
+        <button class="icon-btn" type="button" onclick="exportICS()"
+                aria-label="Kalender exportieren" title="Kalender exportieren">
+            📅
+        </button>
+
+        <button class="icon-btn" type="button" onclick="exportBackup()"
+                aria-label="Backup erstellen" title="Backup erstellen">
+            💾
+        </button>
+
+        <button class="icon-btn" type="button" onclick="importBackup()"
+                aria-label="Backup importieren" title="Backup importieren">
+            📥
+        </button>
+    </div>
+</header>
+
+<main>
+
+    <!-- HEUTE -->
+    <section id="tab-today" class="tab active">
+        <div class="page-head">
+            <h2>Heute</h2>
+            <span id="network-status" class="badge green network">Online</span>
+        </div>
+        <div id="today-container"></div>
+    </section>
+
+    <!-- STUNDENPLAN -->
+    <section id="tab-schedule" class="tab">
+        <div class="page-head">
+            <h2>📅 Wochenplan</h2>
+            <button class="btn primary" type="button" onclick="openSessionModal()">
+                ＋ Termin
+            </button>
+        </div>
+        <div id="schedule-container"></div>
+    </section>
+
+    <!-- TODOS -->
+    <section id="tab-todos" class="tab">
+        <div class="page-head">
+            <h2>✅ Todos</h2>
+            <button class="btn primary" type="button" onclick="openTodoModal()">
+                ＋ Neu
+            </button>
+        </div>
+
+        <input id="todo-search"
+               type="search"
+               placeholder="Todos oder Kurse durchsuchen …"
+               oninput="renderTodos()">
+
+        <div class="filters">
+            <button id="filter-open" class="chip active" type="button"
+                    onclick="setTodoFilter('open')">Offen</button>
+            <button id="filter-all" class="chip" type="button"
+                    onclick="setTodoFilter('all')">Alle</button>
+            <button id="filter-done" class="chip" type="button"
+                    onclick="setTodoFilter('done')">Erledigt</button>
+        </div>
+
+        <div id="todo-list"></div>
+    </section>
+
+    <!-- WORKLOAD -->
+    <section id="tab-workload" class="tab">
+        <div class="page-head">
+            <h2>📊 Workload</h2>
+            <span id="workload-total" class="badge blue">0 h/Woche</span>
+        </div>
+
+        <div id="workload-summary"></div>
+        <div id="workload-cards"></div>
+
+        <div class="page-head" style="margin-top:22px">
+            <h2 style="font-size:16px">📝 Klausuren</h2>
+            <button class="btn primary" type="button" onclick="openExamModal()">
+                ＋ Klausur
+            </button>
+        </div>
+
+        <div id="exam-list"></div>
+
+        <div class="page-head" style="margin-top:22px">
+            <h2 style="font-size:16px">🎓 Notenübersicht</h2>
+        </div>
+
+        <div id="grade-overview"></div>
+    </section>
+
+    <!-- FOKUS -->
+    <section id="tab-focus" class="tab">
+        <div class="page-head">
+            <h2>🎯 Fokus</h2>
+            <span id="streak-badge" class="badge amber">🔥 0 Tage</span>
+        </div>
+
+        <div class="filters" style="justify-content:center">
+            <button class="chip" type="button" onclick="setTimerMode(25)">25 Min.</button>
+            <button class="chip" type="button" onclick="setTimerMode(50)">50 Min.</button>
+            <button class="chip" type="button" onclick="setTimerMode(90)">90 Min.</button>
+        </div>
+
+        <div id="timer-ring" class="timer-ring">
+            <div class="timer-inner">
+                <div id="timer-display">25:00</div>
+                <div id="timer-task">Bereit für Fokus</div>
+            </div>
+        </div>
+
+        <div class="row" style="justify-content:center">
+            <button id="timer-main-button"
+                    class="btn primary"
+                    style="min-width:130px"
+                    type="button"
+                    onclick="toggleTimer()">
+                Starten
+            </button>
+
+            <button class="btn" type="button" onclick="resetTimer()">
+                Reset
+            </button>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+            <div class="row between">
+                <strong>Letzte 7 Tage</strong>
+                <span id="focus-today" class="badge blue">0 Min. heute</span>
+            </div>
+
+            <div id="focus-chart" class="chart"></div>
+
+            <div class="stat-grid">
+                <div>
+                    <div class="item-sub">Diese Woche gesamt</div>
+                    <div class="stat-value" id="stat-week-total">0 Min.</div>
+                </div>
+                <div>
+                    <div class="item-sub">Ø pro aktivem Tag</div>
+                    <div class="stat-value" id="stat-week-avg">0 Min.</div>
+                </div>
+                <div>
+                    <div class="item-sub">Bester Tag (7 Tage)</div>
+                    <div class="stat-value" id="stat-best-day">–</div>
+                </div>
+                <div>
+                    <div class="item-sub">Längste Serie</div>
+                    <div class="stat-value" id="stat-longest-streak">0 Tage</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<nav class="bottom-nav">
+    <button id="nav-today" class="active" type="button" onclick="switchTab('today')">
+        <span>🏠</span>Heute
+    </button>
+    <button id="nav-schedule" type="button" onclick="switchTab('schedule')">
+        <span>📅</span>Plan
+    </button>
+    <button id="nav-todos" type="button" onclick="switchTab('todos')">
+        <span>✅</span>Todos
+    </button>
+    <button id="nav-workload" type="button" onclick="switchTab('workload')">
+        <span>📊</span>Workload
+    </button>
+    <button id="nav-focus" type="button" onclick="switchTab('focus')">
+        <span>🎯</span>Fokus
+    </button>
+</nav>
+
+<!-- TERMIN -->
+<div id="modal-session" class="modal-bg">
+    <div class="modal">
+        <h3 id="session-modal-title">Termin hinzufügen</h3>
+        <input id="session-id" type="hidden">
+
+        <label for="session-course">Kurs / Modul</label>
+        <input id="session-course" list="course-list"
+               placeholder="z. B. Mathematik II">
+
+        <label for="session-type">Art des Termins</label>
+        <select id="session-type">
+            <option value="Vorlesung">Vorlesung</option>
+            <option value="Übung">Übung</option>
+            <option value="Seminar">Seminar</option>
+            <option value="Praktikum">Praktikum</option>
+            <option value="Tutorium">Tutorium</option>
+            <option value="Sprechstunde">Sprechstunde</option>
+            <option value="Sonstiges">Sonstiges</option>
+        </select>
+
+        <label for="session-day">Wochentag</label>
+        <select id="session-day">
+            <option value="0">Montag</option>
+            <option value="1">Dienstag</option>
+            <option value="2">Mittwoch</option>
+            <option value="3">Donnerstag</option>
+            <option value="4">Freitag</option>
+            <option value="5">Samstag</option>
+            <option value="6">Sonntag</option>
+        </select>
+
+        <div class="grid-2">
+            <div>
+                <label for="session-start">Start</label>
+                <input id="session-start" type="time" step="300">
+            </div>
+            <div>
+                <label for="session-end">Ende</label>
+                <input id="session-end" type="time" step="300">
+            </div>
+        </div>
+
+        <label for="session-room">Raum oder Online-Link</label>
+        <input id="session-room" placeholder="z. B. H-101">
+
+        <label for="session-lecturer">Dozent/in</label>
+        <input id="session-lecturer" placeholder="optional">
+
+        <div class="modal-actions">
+            <button class="btn primary" type="button" onclick="saveSession()">
+                Speichern
+            </button>
+            <button class="btn" type="button" onclick="closeModal('modal-session')">
+                Abbrechen
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- TODO -->
+<div id="modal-todo" class="modal-bg">
+    <div class="modal">
+        <h3 id="todo-modal-title">Todo hinzufügen</h3>
+        <input id="todo-id" type="hidden">
+
+        <label for="todo-title">Aufgabe</label>
+        <input id="todo-title" placeholder="z. B. Übungsblatt 3 bearbeiten">
+
+        <label for="todo-course">Kurs / Modul</label>
+        <input id="todo-course" list="course-list"
+               placeholder="optional">
+
+        <label for="todo-due">Fällig am</label>
+        <input id="todo-due" type="date">
+
+        <div class="grid-2">
+            <div>
+                <label for="todo-minutes">Aufwand in Minuten</label>
+                <input id="todo-minutes" type="number" min="1" max="1440" value="45">
+            </div>
+
+            <div>
+                <label for="todo-priority">Priorität</label>
+                <select id="todo-priority">
+                    <option value="1">Niedrig</option>
+                    <option value="2" selected>Normal</option>
+                    <option value="3">Dringend</option>
+                </select>
+            </div>
+        </div>
+
+        <label for="todo-repeat">Wiederholung</label>
+        <select id="todo-repeat">
+            <option value="0">Einmalig</option>
+            <option value="7">Wöchentlich</option>
+            <option value="14">Alle zwei Wochen</option>
+            <option value="30">Monatlich</option>
+        </select>
+
+        <label for="todo-notes">Notiz</label>
+        <textarea id="todo-notes" placeholder="optional"></textarea>
+
+        <div class="modal-actions">
+            <button class="btn primary" type="button" onclick="saveTodo()">
+                Speichern
+            </button>
+            <button class="btn" type="button" onclick="closeModal('modal-todo')">
+                Abbrechen
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- KLAUSUR -->
+<div id="modal-exam" class="modal-bg">
+    <div class="modal">
+        <h3 id="exam-modal-title">Klausur hinzufügen</h3>
+        <input id="exam-id" type="hidden">
+
+        <label for="exam-course">Kurs / Modul</label>
+        <input id="exam-course" list="course-list"
+               placeholder="z. B. Mathematik II">
+
+        <label for="exam-name">Bezeichnung</label>
+        <input id="exam-name" placeholder="z. B. Abschlussklausur">
+
+        <div class="grid-2">
+            <div>
+                <label for="exam-date">Datum</label>
+                <input id="exam-date" type="date">
+            </div>
+            <div>
+                <label for="exam-time">Uhrzeit</label>
+                <input id="exam-time" type="time" value="09:00">
+            </div>
+        </div>
+
+        <label for="exam-room">Raum</label>
+        <input id="exam-room" placeholder="optional">
+
+        <div class="grid-2">
+            <div>
+                <label for="exam-prep-weeks">Vorbereitung in Wochen</label>
+                <input id="exam-prep-weeks" type="number" min="1" max="52" value="4">
+            </div>
+
+            <div>
+                <label for="exam-prep-hours">Lernaufwand gesamt (Std.)</label>
+                <input id="exam-prep-hours" type="number" min="1" max="1000" value="40">
+            </div>
+        </div>
+
+        <label for="exam-weight">Gewichtung an der Endnote (%)</label>
+        <input id="exam-weight" type="number" min="0" max="100" value="100">
+
+        <label for="exam-grade">Erzielte Note (optional, 1,0–5,0)</label>
+        <input id="exam-grade" type="number" min="1" max="5" step="0.1"
+               placeholder="z. B. 1,7 – leer lassen falls noch offen">
+
+        <div class="modal-actions">
+            <button class="btn primary" type="button" onclick="saveExam()">
+                Speichern
+            </button>
+            <button class="btn" type="button" onclick="closeModal('modal-exam')">
+                Abbrechen
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- BESTÄTIGUNGSDIALOG -->
+<div id="confirm-dialog" class="modal-bg">
+    <div class="modal" style="max-width:340px;text-align:center">
+        <div id="confirm-icon" style="font-size:34px;margin-bottom:8px">⚠️</div>
+        <h3 id="confirm-title">Fortfahren?</h3>
+        <p id="confirm-text"
+           style="margin:8px 0 15px;color:var(--muted);font-size:13px;line-height:1.45">
+        </p>
+
+        <div class="modal-actions">
+            <button id="confirm-ok" class="btn danger" type="button">Fortfahren</button>
+            <button id="confirm-cancel" class="btn" type="button">Abbrechen</button>
+        </div>
+    </div>
+</div>
+
+<datalist id="course-list"></datalist>
+
+<div id="toast" class="toast"></div>
+
+<div id="snackbar" class="snackbar">
+    <span id="snackbar-text">Gelöscht</span>
+    <button id="snackbar-undo" class="btn primary" type="button">
+        Rückgängig
+    </button>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   BASIS UND DATENMODELL
+   ========================================================= */
+
+const DB_KEY = "uniplan_v6";
+const SCHEMA_VERSION = 6;
+const LEGACY_KEYS = ["uniplan_v5", "uniplan_v3", "uniplan_data_v1"];
+
+let state = createDefaultState();
+let todoFilter = "open";
+let toastTimer = null;
+let undoTimer = null;
+let confirmResolver = null;
+let audioContext = null;
+
+function createDefaultState() {
+    return {
+        schema: SCHEMA_VERSION,
+        sessions: [],
+        todos: [],
+        exams: [],
+        focus: {
+            log: {},
+            timer: {
+                status: "idle",
+                durationSec: 25 * 60,
+                remainingSec: 25 * 60,
+                endsAt: null,
+                task: "Bereit für Fokus",
+                todoId: null
+            }
+        },
+        meta: {
+            lastBackupAt: null
+        }
+    };
+}
+
+function uid() {
+    return "u" + Date.now().toString(36) +
+           Math.random().toString(36).slice(2, 8);
+}
+
+function safeId(value) {
+    const text = String(value || "");
+    return /^[A-Za-z0-9_-]+$/.test(text) ? text : uid();
+}
+
+function localDateKey(date = new Date()) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+
+function dateOrdinal(isoDate) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(isoDate || ""))) {
+        return null;
+    }
+
+    const [y, m, d] = isoDate.split("-").map(Number);
+    return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+}
+
+function daysFromToday(isoDate) {
+    const ordinal = dateOrdinal(isoDate);
+    const today = dateOrdinal(localDateKey());
+    return ordinal === null ? null : ordinal - today;
+}
+
+function shiftDate(isoDate, days) {
+    const ordinal = dateOrdinal(isoDate);
+    if (ordinal === null) return "";
+
+    const date = new Date((ordinal + Number(days)) * 86400000);
+    return date.toISOString().slice(0, 10);
+}
+
+function formatDate(isoDate) {
+    if (!isoDate) return "kein Datum";
+
+    const [y, m, d] = isoDate.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+
+    return new Intl.DateTimeFormat("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    }).format(date);
+}
+
+function formatShortDate(isoDate) {
+    if (!isoDate) return "";
+
+    const [y, m, d] = isoDate.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+
+    return new Intl.DateTimeFormat("de-DE", {
+        day: "2-digit",
+        month: "2-digit"
+    }).format(date);
+}
+
+function esc(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function timeToMinutes(time) {
+    if (!/^\d{2}:\d{2}$/.test(String(time || ""))) return null;
+
+    const [h, m] = time.split(":").map(Number);
+    if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+
+    return h * 60 + m;
+}
+
+function parseOptionalGrade(rawValue) {
+    if (rawValue === null || rawValue === undefined || rawValue === "") {
+        return null;
+    }
+
+    const numeric = Number(rawValue);
+
+    if (!Number.isFinite(numeric)) {
+        return null;
+    }
+
+    return Math.min(5, Math.max(1, numeric));
+}
+
+function normalizeData(raw) {
+    const output = createDefaultState();
+    const input = raw && typeof raw === "object" ? raw : {};
+
+    output.sessions = Array.isArray(input.sessions)
+        ? input.sessions.map(item => ({
+            id: safeId(item.id),
+            course: String(item.course || "Unbenannt"),
+            type: String(item.type || "Vorlesung"),
+            day: Math.min(6, Math.max(0, Number(item.day) || 0)),
+            start: String(item.start || "08:00"),
+            end: String(item.end || "09:30"),
+            room: String(item.room || ""),
+            lecturer: String(item.lecturer || "")
+        }))
+        : [];
+
+    output.todos = Array.isArray(input.todos)
+        ? input.todos.map(item => ({
+            id: safeId(item.id),
+            title: String(item.title || "Unbenannte Aufgabe"),
+            course: String(item.course || ""),
+            due: String(item.due || ""),
+            min: Math.max(1, Number(item.min || item.estimated_minutes) || 45),
+            prio: Math.min(3, Math.max(1, Number(item.prio || item.priority) || 2)),
+            notes: String(item.notes || item.description || ""),
+            repeatDays: Math.max(0, Number(item.repeatDays || item.repeat) || 0),
+            done: Boolean(item.done || item.status === "erledigt"),
+            created: String(item.created || item.created_at || new Date().toISOString()),
+            completedAt: item.completedAt || item.completed_at || null,
+            sourceId: item.sourceId || null,
+            generatedNextId: item.generatedNextId || null
+        }))
+        : [];
+
+    output.exams = Array.isArray(input.exams)
+        ? input.exams.map(item => ({
+            id: safeId(item.id),
+            course: String(item.course || "Unbekannter Kurs"),
+            name: String(item.name || "Klausur"),
+            date: String(item.date || item.exam_date || ""),
+            time: String(item.time || "09:00"),
+            room: String(item.room || ""),
+            weight: Math.max(0, Number(item.weight) || 100),
+            prepWeeks: Math.max(1, Number(item.prepWeeks || item.prep_weeks) || 4),
+            prepHours: Math.max(
+                1,
+                Number(item.prepHours || item.prep_hours) ||
+                Math.max(20, (Number(item.weight) || 100) * 0.4)
+            ),
+            grade: parseOptionalGrade(item.grade)
+        }))
+        : [];
+
+    if (input.focus && input.focus.log &&
+        typeof input.focus.log === "object") {
+        output.focus.log = input.focus.log;
+    } else if (input.focus && input.focus.date) {
+        output.focus.log[input.focus.date] =
+            Number(input.focus.minutes) || 0;
+    } else if (input.focusMinToday) {
+        output.focus.log[localDateKey()] =
+            Number(input.focusMinToday) || 0;
+    }
+
+    if (input.focus && input.focus.timer) {
+        output.focus.timer = {
+            ...output.focus.timer,
+            ...input.focus.timer
+        };
+    }
+
+    if (input.meta && typeof input.meta === "object") {
+        output.meta = {
+            ...output.meta,
+            ...input.meta
+        };
+    }
+
+    output.schema = SCHEMA_VERSION;
+    return output;
+}
+
+function loadData() {
+    let raw = null;
+
+    try {
+        const current = localStorage.getItem(DB_KEY);
+
+        if (current) {
+            raw = JSON.parse(current);
+        } else {
+            let legacyRaw = null;
+
+            for (const key of LEGACY_KEYS) {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    legacyRaw = value;
+                    break;
+                }
+            }
+
+            if (legacyRaw) {
+                raw = JSON.parse(legacyRaw);
+            } else {
+                const oldSessions = localStorage.getItem("uniplan_sessions");
+                const oldTodos = localStorage.getItem("uniplan_todos");
+
+                if (oldSessions || oldTodos) {
+                    raw = {
+                        sessions: JSON.parse(oldSessions || "[]"),
+                        todos: JSON.parse(oldTodos || "[]")
+                    };
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Fehler beim Laden:", error);
+    }
+
+    state = normalizeData(raw || {});
+    saveData(false);
+}
+
+function saveData(updateView = true) {
+    try {
+        state.schema = SCHEMA_VERSION;
+        localStorage.setItem(DB_KEY, JSON.stringify(state));
+
+        if (updateView) {
+            updateHeader();
+        }
+    } catch (error) {
+        console.error("Speicherfehler:", error);
+        showToast("Daten konnten nicht gespeichert werden");
+    }
+}
+
+/* =========================================================
+   ALLGEMEINE OBERFLÄCHE
+   ========================================================= */
+
+function showToast(message) {
+    const element = document.getElementById("toast");
+    element.textContent = message;
+    element.classList.add("show");
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        element.classList.remove("show");
+    }, 2200);
+}
+
+function showUndo(message, callback) {
+    const bar = document.getElementById("snackbar");
+    const button = document.getElementById("snackbar-undo");
+
+    clearTimeout(undoTimer);
+    document.getElementById("snackbar-text").textContent = message;
+    bar.classList.add("show");
+
+    button.onclick = () => {
+        clearTimeout(undoTimer);
+        bar.classList.remove("show");
+        callback();
+    };
+
+    undoTimer = setTimeout(() => {
+        bar.classList.remove("show");
+        button.onclick = null;
+    }, 5000);
+}
+
+function askUser(title, text, okText = "Fortfahren", icon = "⚠️") {
+    return new Promise(resolve => {
+        confirmResolver = resolve;
+
+        document.getElementById("confirm-title").textContent = title;
+        document.getElementById("confirm-text").textContent = text;
+        document.getElementById("confirm-icon").textContent = icon;
+        document.getElementById("confirm-ok").textContent = okText;
+        document.getElementById("confirm-dialog").classList.add("show");
+        document.body.style.overflow = "hidden";
+    });
+}
+
+function settleConfirmation(result) {
+    document.getElementById("confirm-dialog").classList.remove("show");
+    document.body.style.overflow = "";
+
+    if (confirmResolver) {
+        const resolver = confirmResolver;
+        confirmResolver = null;
+        resolver(result);
+    }
+}
+
+document.getElementById("confirm-ok").onclick = () => {
+    settleConfirmation(true);
+};
+
+document.getElementById("confirm-cancel").onclick = () => {
+    settleConfirmation(false);
+};
+
+function openModal(id) {
+    document.getElementById(id).classList.add("show");
+    document.body.style.overflow = "hidden";
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove("show");
+    document.body.style.overflow = "";
+}
+
+document.querySelectorAll(".modal-bg").forEach(modal => {
+    if (modal.id === "confirm-dialog") return;
+
+    modal.addEventListener("click", event => {
+        if (event.target === modal) {
+            closeModal(modal.id);
+        }
+    });
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+
+    const openModalElement =
+        document.querySelector(".modal-bg.show:not(#confirm-dialog)");
+
+    if (openModalElement) {
+        closeModal(openModalElement.id);
+    }
+});
+
+function switchTab(name) {
+    document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.remove("active");
+    });
+
+    document.querySelectorAll(".bottom-nav button").forEach(button => {
+        button.classList.remove("active");
+    });
+
+    document.getElementById(`tab-${name}`).classList.add("active");
+    document.getElementById(`nav-${name}`).classList.add("active");
+
+    window.scrollTo({ top: 0, behavior: "instant" });
+
+    if (name === "today") renderToday();
+    if (name === "todos") renderTodos();
+    if (name === "workload") renderWorkload();
+    if (name === "focus") renderFocusStatistics();
+}
+
+function updateHeader() {
+    const openTodos = state.todos.filter(todo => !todo.done).length;
+    const todayMinutes = Number(state.focus.log[localDateKey()] || 0);
+
+    document.getElementById("top-subtitle").textContent =
+        `${todayMinutes} Min. Fokus · ${openTodos} Todos offen`;
+}
+
+function updateNetworkStatus() {
+    const element = document.getElementById("network-status");
+
+    if (navigator.onLine) {
+        element.textContent = "Online";
+        element.className = "badge green network";
+    } else {
+        element.textContent = "Offline";
+        element.className = "badge amber network offline";
+    }
+}
+
+window.addEventListener("online", updateNetworkStatus);
+window.addEventListener("offline", updateNetworkStatus);
+
+const COURSE_COLORS = [
+    "#3b82f6",
+    "#10b981",
+    "#8b5cf6",
+    "#f59e0b",
+    "#ec4899",
+    "#06b6d4",
+    "#ef4444",
+    "#84cc16"
+];
+
+function courseColor(name) {
+    let hash = 0;
+
+    for (const character of String(name || "")) {
+        hash = ((hash * 31) + character.charCodeAt(0)) >>> 0;
+    }
+
+    return COURSE_COLORS[hash % COURSE_COLORS.length];
+}
+
+function gradeBadgeClass(grade) {
+    if (grade === null || grade === undefined) return "blue";
+    if (grade <= 2.5) return "green";
+    if (grade <= 4.0) return "amber";
+    return "red";
+}
+
+function getCourses() {
+    return [...new Set([
+        ...state.sessions.map(item => item.course),
+        ...state.todos.map(item => item.course),
+        ...state.exams.map(item => item.course)
+    ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "de"));
+}
+
+function refreshCourseList() {
+    document.getElementById("course-list").innerHTML =
+        getCourses()
+            .map(course => `<option value="${esc(course)}"></option>`)
+            .join("");
+}
+
+/* =========================================================
+   TERMINE
+   ========================================================= */
+
+function openSessionModal(id = null) {
+    refreshCourseList();
+
+    const session = id
+        ? state.sessions.find(item => item.id === id)
+        : null;
+
+    document.getElementById("session-modal-title").textContent =
+        session ? "Termin bearbeiten" : "Termin hinzufügen";
+
+    document.getElementById("session-id").value =
+        session ? session.id : "";
+
+    document.getElementById("session-course").value =
+        session ? session.course : "";
+
+    document.getElementById("session-type").value =
+        session ? session.type : "Vorlesung";
+
+    document.getElementById("session-day").value =
+        session ? String(session.day) : "0";
+
+    document.getElementById("session-start").value =
+        session ? session.start : "08:00";
+
+    document.getElementById("session-end").value =
+        session ? session.end : "09:30";
+
+    document.getElementById("session-room").value =
+        session ? session.room : "";
+
+    document.getElementById("session-lecturer").value =
+        session ? session.lecturer : "";
+
+    openModal("modal-session");
+}
+
+function saveSession() {
+    const id = document.getElementById("session-id").value;
+    const course = document.getElementById("session-course").value.trim();
+    const start = document.getElementById("session-start").value;
+    const end = document.getElementById("session-end").value;
+
+    const startMinutes = timeToMinutes(start);
+    const endMinutes = timeToMinutes(end);
+
+    if (!course || startMinutes === null || endMinutes === null) {
+        showToast("Bitte Kurs, Start und Ende angeben");
+        return;
+    }
+
+    if (endMinutes <= startMinutes) {
+        showToast("Die Endzeit muss nach der Startzeit liegen");
+        return;
+    }
+
+    const values = {
+        course,
+        type: document.getElementById("session-type").value,
+        day: Number(document.getElementById("session-day").value),
+        start,
+        end,
+        room: document.getElementById("session-room").value.trim(),
+        lecturer: document.getElementById("session-lecturer").value.trim()
+    };
+
+    if (id) {
+        const index = state.sessions.findIndex(item => item.id === id);
+
+        if (index >= 0) {
+            state.sessions[index] = {
+                ...state.sessions[index],
+                ...values
+            };
+        }
+
+        showToast("Termin aktualisiert");
+    } else {
+        state.sessions.push({
+            id: uid(),
+            ...values
+        });
+
+        showToast("Termin hinzugefügt");
+    }
+
+    saveData();
+    closeModal("modal-session");
+    renderAll();
+}
+
+function sessionHasConflict(session) {
+    const start = timeToMinutes(session.start);
+    const end = timeToMinutes(session.end);
+
+    return state.sessions.some(other => {
+        if (other.id === session.id ||
+            Number(other.day) !== Number(session.day)) {
+            return false;
+        }
+
+        const otherStart = timeToMinutes(other.start);
+        const otherEnd = timeToMinutes(other.end);
+
+        return otherStart < end && start < otherEnd;
+    });
+}
+
+function sessionCard(session) {
+    const conflict = sessionHasConflict(session);
+    const color = courseColor(session.course);
+
+    return `
+        <article class="item"
+                 style="border-left:4px solid ${color}">
+            <div class="item-main">
+                <div class="item-content">
+                    <div class="item-title">
+                        ${esc(session.course)}
+                        ${conflict
+                            ? '<span class="badge red">⚠ Überschneidung</span>'
+                            : ''}
+                    </div>
+
+                    <div class="item-sub">
+                        ${esc(session.type)}
+                        · ${esc(session.start)}–${esc(session.end)}
+                    </div>
+
+                    <div class="item-sub">
+                        📍 ${esc(session.room || "Online / kein Raum")}
+                        ${session.lecturer
+                            ? ` · ${esc(session.lecturer)}`
+                            : ""}
+                    </div>
+                </div>
+
+                <div class="item-actions">
+                    <button class="mini-btn edit"
+                            type="button"
+                            aria-label="Termin bearbeiten"
+                            onclick="openSessionModal('${session.id}')">
+                        ✏️
+                    </button>
+
+                    <button class="mini-btn delete"
+                            type="button"
+                            aria-label="Termin löschen"
+                            onclick="deleteItem('sessions','${session.id}','Termin')">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function renderSchedule() {
+    const container = document.getElementById("schedule-container");
+    const days = [
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag",
+        "Samstag",
+        "Sonntag"
+    ];
+
+    let html = "";
+
+    days.forEach((dayName, dayIndex) => {
+        const sessions = state.sessions
+            .filter(item => Number(item.day) === dayIndex)
+            .sort((a, b) => a.start.localeCompare(b.start));
+
+        if (!sessions.length) return;
+
+        html += `<div class="section-title">${dayName}</div>`;
+        html += sessions.map(sessionCard).join("");
+    });
+
+    container.innerHTML = html || `
+        <div class="empty">
+            Noch keine Termine.<br>
+            Tippe oben auf „＋ Termin“.
+        </div>
+    `;
+}
+
+/* =========================================================
+   TODOS
+   ========================================================= */
+
+function openTodoModal(id = null) {
+    refreshCourseList();
+
+    const todo = id
+        ? state.todos.find(item => item.id === id)
+        : null;
+
+    document.getElementById("todo-modal-title").textContent =
+        todo ? "Todo bearbeiten" : "Todo hinzufügen";
+
+    document.getElementById("todo-id").value =
+        todo ? todo.id : "";
+
+    document.getElementById("todo-title").value =
+        todo ? todo.title : "";
+
+    document.getElementById("todo-course").value =
+        todo ? todo.course : "";
+
+    document.getElementById("todo-due").value =
+        todo ? todo.due : "";
+
+    document.getElementById("todo-minutes").value =
+        todo ? todo.min : 45;
+
+    document.getElementById("todo-priority").value =
+        todo ? String(todo.prio) : "2";
+
+    document.getElementById("todo-repeat").value =
+        todo ? String(todo.repeatDays || 0) : "0";
+
+    document.getElementById("todo-notes").value =
+        todo ? todo.notes : "";
+
+    openModal("modal-todo");
+}
+
+function saveTodo() {
+    const id = document.getElementById("todo-id").value;
+    const title = document.getElementById("todo-title").value.trim();
+    const minutes = Number(document.getElementById("todo-minutes").value);
+
+    if (!title) {
+        showToast("Bitte einen Titel eingeben");
+        return;
+    }
+
+    if (!Number.isFinite(minutes) || minutes < 1) {
+        showToast("Bitte einen gültigen Aufwand eingeben");
+        return;
+    }
+
+    const values = {
+        title,
+        course: document.getElementById("todo-course").value.trim(),
+        due: document.getElementById("todo-due").value,
+        min: Math.round(minutes),
+        prio: Number(document.getElementById("todo-priority").value),
+        repeatDays: Number(document.getElementById("todo-repeat").value),
+        notes: document.getElementById("todo-notes").value.trim()
+    };
+
+    if (id) {
+        const index = state.todos.findIndex(item => item.id === id);
+
+        if (index >= 0) {
+            state.todos[index] = {
+                ...state.todos[index],
+                ...values
+            };
+        }
+
+        showToast("Todo aktualisiert");
+    } else {
+        state.todos.push({
+            id: uid(),
+            done: false,
+            created: new Date().toISOString(),
+            completedAt: null,
+            sourceId: null,
+            generatedNextId: null,
+            ...values
+        });
+
+        showToast("Todo hinzugefügt");
+    }
+
+    saveData();
+    closeModal("modal-todo");
+    renderAll();
+}
+
+function toggleTodo(id) {
+    const todo = state.todos.find(item => item.id === id);
+    if (!todo) return;
+
+    const willBeDone = !todo.done;
+    todo.done = willBeDone;
+    todo.completedAt = willBeDone ? new Date().toISOString() : null;
+
+    if (willBeDone && todo.repeatDays > 0 && todo.due) {
+        const existingNext = todo.generatedNextId
+            ? state.todos.find(item => item.id === todo.generatedNextId)
+            : null;
+
+        if (!existingNext) {
+            const nextTodo = {
+                ...todo,
+                id: uid(),
+                due: shiftDate(todo.due, todo.repeatDays),
+                done: false,
+                created: new Date().toISOString(),
+                completedAt: null,
+                sourceId: todo.id,
+                generatedNextId: null
+            };
+
+            todo.generatedNextId = nextTodo.id;
+            state.todos.push(nextTodo);
+            showToast("Nächste Wiederholung wurde angelegt");
+        }
+    }
+
+    if (!willBeDone && todo.generatedNextId) {
+        const nextIndex = state.todos.findIndex(item =>
+            item.id === todo.generatedNextId &&
+            item.sourceId === todo.id &&
+            !item.done
+        );
+
+        if (nextIndex >= 0) {
+            state.todos.splice(nextIndex, 1);
+        }
+
+        todo.generatedNextId = null;
+    }
+
+    saveData();
+    renderAll();
+}
+
+function setTodoFilter(filter) {
+    todoFilter = filter;
+
+    ["open", "all", "done"].forEach(name => {
+        document.getElementById(`filter-${name}`)
+            .classList.toggle("active", name === filter);
+    });
+
+    renderTodos();
+}
+
+function todoBucket(todo) {
+    if (!todo.due) return "Ohne Datum";
+
+    const days = daysFromToday(todo.due);
+
+    if (days < 0) return "⚠ Überfällig";
+    if (days === 0) return "Heute";
+    if (days <= 7) return "Diese Woche";
+    return "Später";
+}
+
+function todoCard(todo) {
+    const priority =
+        todo.prio === 3 ? "🔴" :
+        todo.prio === 2 ? "🟡" : "🟢";
+
+    const overdue = !todo.done &&
+                    todo.due &&
+                    daysFromToday(todo.due) < 0;
+
+    return `
+        <article class="item ${overdue ? "danger-card" : ""}">
+            <div class="item-main">
+                <div class="row" style="align-items:flex-start;flex:1;min-width:0">
+                    <input class="checkbox"
+                           type="checkbox"
+                           aria-label="Todo erledigen"
+                           ${todo.done ? "checked" : ""}
+                           onchange="toggleTodo('${todo.id}')">
+
+                    <div class="item-content">
+                        <div class="item-title"
+                             style="${todo.done
+                                ? "text-decoration:line-through;opacity:.65"
+                                : ""}">
+                            ${priority} ${esc(todo.title)}
+                        </div>
+
+                        <div class="item-sub">
+                            ${todo.course
+                                ? `${esc(todo.course)} · `
+                                : ""}
+                            ${todo.due
+                                ? `Fällig: ${esc(formatDate(todo.due))} · `
+                                : ""}
+                            ca. ${esc(todo.min)} Min.
+                        </div>
+
+                        ${todo.repeatDays
+                            ? `<div class="item-sub">🔁 Wiederholung alle ${todo.repeatDays} Tage</div>`
+                            : ""}
+
+                        ${todo.notes
+                            ? `<div class="item-sub">📝 ${esc(todo.notes)}</div>`
+                            : ""}
+
+                        ${!todo.done
+                            ? `
+                                <button class="btn"
+                                        type="button"
+                                        style="min-height:36px;margin-top:8px;padding:6px 10px"
+                                        onclick="startTodoFocus('${todo.id}')">
+                                    🎯 Fokus starten
+                                </button>
+                              `
+                            : ""}
+                    </div>
+                </div>
+
+                <div class="item-actions">
+                    <button class="mini-btn edit"
+                            type="button"
+                            aria-label="Todo bearbeiten"
+                            onclick="openTodoModal('${todo.id}')">
+                        ✏️
+                    </button>
+
+                    <button class="mini-btn delete"
+                            type="button"
+                            aria-label="Todo löschen"
+                            onclick="deleteItem('todos','${todo.id}','Todo')">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function renderTodos() {
+    const searchElement = document.getElementById("todo-search");
+    const query = String(searchElement ? searchElement.value : "")
+        .trim()
+        .toLowerCase();
+
+    let todos = state.todos.filter(todo => {
+        const searchable =
+            `${todo.title} ${todo.course} ${todo.notes}`.toLowerCase();
+
+        if (query && !searchable.includes(query)) return false;
+        if (todoFilter === "open" && todo.done) return false;
+        if (todoFilter === "done" && !todo.done) return false;
+
+        return true;
+    });
+
+    todos.sort((a, b) => {
+        if (a.done !== b.done) return Number(a.done) - Number(b.done);
+
+        const dueA = a.due || "9999-12-31";
+        const dueB = b.due || "9999-12-31";
+
+        if (dueA !== dueB) return dueA.localeCompare(dueB);
+        return b.prio - a.prio;
+    });
+
+    const container = document.getElementById("todo-list");
+
+    if (!todos.length) {
+        container.innerHTML = `
+            <div class="empty">
+                Keine passenden Todos gefunden.
+            </div>
+        `;
+        return;
+    }
+
+    const groups = {};
+
+    todos.forEach(todo => {
+        const bucket = todo.done ? "Erledigt" : todoBucket(todo);
+        if (!groups[bucket]) groups[bucket] = [];
+        groups[bucket].push(todo);
+    });
+
+    const order = [
+        "⚠ Überfällig",
+        "Heute",
+        "Diese Woche",
+        "Später",
+        "Ohne Datum",
+        "Erledigt"
+    ];
+
+    let html = "";
+
+    order.forEach(groupName => {
+        if (!groups[groupName]) return;
+
+        html += `
+            <div class="section-title
+                 ${groupName.includes("Überfällig") ? "danger" : ""}">
+                ${groupName} (${groups[groupName].length})
+            </div>
+        `;
+
+        html += groups[groupName].map(todoCard).join("");
+    });
+
+    container.innerHTML = html;
+}
+
+/* =========================================================
+   KLAUSUREN UND WORKLOAD
+   ========================================================= */
+
+function openExamModal(id = null) {
+    refreshCourseList();
+
+    const exam = id
+        ? state.exams.find(item => item.id === id)
+        : null;
+
+    document.getElementById("exam-modal-title").textContent =
+        exam ? "Klausur bearbeiten" : "Klausur hinzufügen";
+
+    document.getElementById("exam-id").value =
+        exam ? exam.id : "";
+
+    document.getElementById("exam-course").value =
+        exam ? exam.course : "";
+
+    document.getElementById("exam-name").value =
+        exam ? exam.name : "";
+
+    document.getElementById("exam-date").value =
+        exam ? exam.date : "";
+
+    document.getElementById("exam-time").value =
+        exam ? exam.time : "09:00";
+
+    document.getElementById("exam-room").value =
+        exam ? exam.room : "";
+
+    document.getElementById("exam-prep-weeks").value =
+        exam ? exam.prepWeeks : 4;
+
+    document.getElementById("exam-prep-hours").value =
+        exam ? exam.prepHours : 40;
+
+    document.getElementById("exam-weight").value =
+        exam ? exam.weight : 100;
+
+    document.getElementById("exam-grade").value =
+        exam && exam.grade !== null && exam.grade !== undefined
+            ? exam.grade
+            : "";
+
+    openModal("modal-exam");
+}
+
+function saveExam() {
+    const id = document.getElementById("exam-id").value;
+    const course = document.getElementById("exam-course").value.trim();
+    const name = document.getElementById("exam-name").value.trim();
+    const date = document.getElementById("exam-date").value;
+
+    if (!course || !name || !date) {
+        showToast("Bitte Kurs, Bezeichnung und Datum angeben");
+        return;
+    }
+
+    const values = {
+        course,
+        name,
+        date,
+        time: document.getElementById("exam-time").value || "09:00",
+        room: document.getElementById("exam-room").value.trim(),
+        prepWeeks: Math.max(
+            1,
+            Number(document.getElementById("exam-prep-weeks").value) || 4
+        ),
+        prepHours: Math.max(
+            1,
+            Number(document.getElementById("exam-prep-hours").value) || 40
+        ),
+        weight: Math.max(
+            0,
+            Number(document.getElementById("exam-weight").value) || 100
+        ),
+        grade: parseOptionalGrade(
+            document.getElementById("exam-grade").value
+        )
+    };
+
+    if (id) {
+        const index = state.exams.findIndex(item => item.id === id);
+
+        if (index >= 0) {
+            state.exams[index] = {
+                ...state.exams[index],
+                ...values
+            };
+        }
+
+        showToast("Klausur aktualisiert");
+    } else {
+        state.exams.push({
+            id: uid(),
+            ...values
+        });
+
+        showToast("Klausur hinzugefügt");
+    }
+
+    saveData();
+    closeModal("modal-exam");
+    renderAll();
+}
+
+function examPhases(exam) {
+    const totalDays = Math.max(21, exam.prepWeeks * 7);
+    const start = shiftDate(exam.date, -totalDays);
+    const phase2Start = shiftDate(start, Math.round(totalDays * 0.4));
+    const phase3Start = shiftDate(start, Math.round(totalDays * 0.75));
+    const end = shiftDate(exam.date, -1);
+
+    return [
+        {
+            icon: "📖",
+            name: "Grundlagen",
+            range: `${formatShortDate(start)}–${formatShortDate(shiftDate(phase2Start, -1))}`,
+            text: "Skript durcharbeiten, Zusammenfassung und Begriffsnetz erstellen."
+        },
+        {
+            icon: "✍️",
+            name: "Aktive Übung",
+            range: `${formatShortDate(phase2Start)}–${formatShortDate(shiftDate(phase3Start, -1))}`,
+            text: "Aufgaben ohne Musterlösung bearbeiten und Wissenslücken markieren."
+        },
+        {
+            icon: "🎯",
+            name: "Prüfungssimulation",
+            range: `${formatShortDate(phase3Start)}–${formatShortDate(end)}`,
+            text: "Altklausuren unter Zeitdruck bearbeiten und Fehler gezielt wiederholen."
+        }
+    ];
+}
+
+function examCard(exam) {
+    const days = daysFromToday(exam.date);
+    const weekly = exam.prepHours / Math.max(1, exam.prepWeeks);
+
+    let countdown;
+
+    if (days < 0) countdown = "vorbei";
+    else if (days === 0) countdown = "heute";
+    else if (days === 1) countdown = "morgen";
+    else countdown = `noch ${days} Tage`;
+
+    const countdownClass =
+        days >= 0 && days <= 7 ? "red" :
+        days >= 0 && days <= 21 ? "amber" : "blue";
+
+    const phases = examPhases(exam);
+
+    return `
+        <article class="item"
+                 style="border-left:4px solid ${courseColor(exam.course)}">
+            <div class="item-main">
+                <div class="item-content">
+                    <div class="item-title">
+                        📝 ${esc(exam.course)} – ${esc(exam.name)}
+                    </div>
+
+                    <div class="item-sub">
+                        ${esc(formatDate(exam.date))}
+                        · ${esc(exam.time)}
+                        ${exam.room ? ` · ${esc(exam.room)}` : ""}
+                    </div>
+
+                    <div class="item-sub">
+                        ${esc(exam.prepHours)} Lernstunden in
+                        ${esc(exam.prepWeeks)} Wochen
+                        · ca. ${weekly.toFixed(1)} h/Woche
+                    </div>
+
+                    <div style="margin-top:7px">
+                        <span class="badge ${countdownClass}">
+                            ${esc(countdown)}
+                        </span>
+                        <span class="badge blue">
+                            Gewichtung ${esc(exam.weight)} %
+                        </span>
+                        ${exam.grade !== null && exam.grade !== undefined
+                            ? `<span class="badge ${gradeBadgeClass(exam.grade)}">
+                                   Note ${exam.grade.toFixed(1)}
+                               </span>`
+                            : `<span class="badge blue">Note offen</span>`}
+                    </div>
+
+                    <details>
+                        <summary>Lernphasen anzeigen</summary>
+                        ${phases.map(phase => `
+                            <div class="phase">
+                                <strong>
+                                    ${phase.icon} ${esc(phase.name)}
+                                    · ${esc(phase.range)}
+                                </strong>
+                                <br>
+                                ${esc(phase.text)}
+                            </div>
+                        `).join("")}
+                    </details>
+                </div>
+
+                <div class="item-actions">
+                    <button class="mini-btn edit"
+                            type="button"
+                            aria-label="Klausur bearbeiten"
+                            onclick="openExamModal('${exam.id}')">
+                        ✏️
+                    </button>
+
+                    <button class="mini-btn delete"
+                            type="button"
+                            aria-label="Klausur löschen"
+                            onclick="deleteItem('exams','${exam.id}','Klausur')">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function renderExams() {
+    const container = document.getElementById("exam-list");
+
+    const exams = [...state.exams]
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    container.innerHTML = exams.length
+        ? exams.map(examCard).join("")
+        : `
+            <div class="empty">
+                Noch keine Klausuren eingetragen.
+            </div>
+          `;
+}
+
+function calculateGradeOverview() {
+    const perCourse = {};
+
+    state.exams.forEach(exam => {
+        const course = exam.course || "Unbekannt";
+
+        if (!perCourse[course]) {
+            perCourse[course] = {
+                gradedWeightSum: 0,
+                gradedWeightedGrade: 0,
+                totalWeight: 0,
+                gradedCount: 0,
+                examCount: 0
+            };
+        }
+
+        const entry = perCourse[course];
+        entry.totalWeight += exam.weight;
+        entry.examCount += 1;
+
+        if (exam.grade !== null && exam.grade !== undefined) {
+            entry.gradedWeightSum += exam.weight;
+            entry.gradedWeightedGrade += exam.weight * exam.grade;
+            entry.gradedCount += 1;
+        }
+    });
+
+    const rows = Object.entries(perCourse)
+        .map(([course, data]) => ({
+            course,
+            average: data.gradedWeightSum > 0
+                ? data.gradedWeightedGrade / data.gradedWeightSum
+                : null,
+            totalWeight: data.totalWeight,
+            gradedCount: data.gradedCount,
+            examCount: data.examCount,
+            overWeighted: data.totalWeight > 100.5
+        }))
+        .sort((a, b) => a.course.localeCompare(b.course, "de"));
+
+    let overallWeightedSum = 0;
+    let overallWeightTotal = 0;
+
+    state.exams.forEach(exam => {
+        if (exam.grade !== null && exam.grade !== undefined) {
+            overallWeightedSum += exam.weight * exam.grade;
+            overallWeightTotal += exam.weight;
+        }
+    });
+
+    const overallAverage = overallWeightTotal > 0
+        ? overallWeightedSum / overallWeightTotal
+        : null;
+
+    return { rows, overallAverage };
+}
+
+function renderGradeOverview() {
+    const container = document.getElementById("grade-overview");
+    const { rows, overallAverage } = calculateGradeOverview();
+
+    if (!rows.length) {
+        container.innerHTML = `
+            <div class="empty">
+                Noch keine Klausuren für eine Notenübersicht vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    let html = "";
+
+    if (overallAverage !== null) {
+        html += `
+            <div class="card">
+                <div class="row between">
+                    <strong>Gesamtdurchschnitt (gewichtet)</strong>
+                    <span class="badge ${gradeBadgeClass(overallAverage)}"
+                          style="font-size:13px;padding:6px 12px">
+                        ${overallAverage.toFixed(2)}
+                    </span>
+                </div>
+                <div class="item-sub" style="margin-top:6px">
+                    Berechnet aus allen Klausuren mit eingetragener Note,
+                    gewichtet nach ihrer Prozentangabe. ECTS werden dabei
+                    nicht berücksichtigt.
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="card">
+                <div class="item-sub">
+                    Trage bei einer Klausur eine Note ein, um hier einen
+                    Durchschnitt zu sehen.
+                </div>
+            </div>
+        `;
+    }
+
+    html += rows.map(row => `
+        <article class="item"
+                 style="border-left:4px solid ${courseColor(row.course)}">
+            <div class="item-main">
+                <div class="item-content">
+                    <div class="item-title">${esc(row.course)}</div>
+                    <div class="item-sub">
+                        ${row.gradedCount} von ${row.examCount}
+                        Klausuren benotet
+                        · Gewichtung gesamt: ${row.totalWeight.toFixed(0)} %
+                        ${row.overWeighted
+                            ? " · ⚠️ Gewichtung über 100 %"
+                            : ""}
+                    </div>
+                </div>
+
+                ${row.average !== null
+                    ? `<span class="badge ${gradeBadgeClass(row.average)}">
+                           ${row.average.toFixed(2)}
+                       </span>`
+                    : `<span class="badge blue">offen</span>`}
+            </div>
+        </article>
+    `).join("");
+
+    container.innerHTML = html;
+}
+
+function todoWeeklyHours(todo) {
+    if (todo.done) return 0;
+
+    const hours = todo.min / 60;
+
+    if (todo.repeatDays > 0) {
+        return hours * (7 / todo.repeatDays);
+    }
+
+    if (!todo.due) {
+        return hours;
+    }
+
+    const days = daysFromToday(todo.due);
+
+    return days <= 7 ? hours : 0;
+}
+
+function examWeeklyHours(exam) {
+    const days = daysFromToday(exam.date);
+    const prepDays = exam.prepWeeks * 7;
+
+    if (days < 0 || days > prepDays) return 0;
+
+    return exam.prepHours / Math.max(1, exam.prepWeeks);
+}
+
+function calculateWorkload() {
+    const map = {};
+
+    function ensure(course) {
+        const name = course || "Allgemein";
+
+        if (!map[name]) {
+            map[name] = {
+                sessions: 0,
+                todos: 0,
+                exams: 0
+            };
+        }
+
+        return map[name];
+    }
+
+    state.sessions.forEach(session => {
+        const start = timeToMinutes(session.start);
+        const end = timeToMinutes(session.end);
+
+        if (start !== null && end !== null && end > start) {
+            ensure(session.course).sessions += (end - start) / 60;
+        }
+    });
+
+    state.todos.forEach(todo => {
+        ensure(todo.course || "Allgemein").todos +=
+            todoWeeklyHours(todo);
+    });
+
+    state.exams.forEach(exam => {
+        ensure(exam.course).exams += examWeeklyHours(exam);
+    });
+
+    return map;
+}
+
+function renderWorkload() {
+    const map = calculateWorkload();
+
+    const entries = Object.entries(map)
+        .map(([course, values]) => ({
+            course,
+            ...values,
+            total: values.sessions + values.todos + values.exams
+        }))
+        .filter(item => item.total > 0)
+        .sort((a, b) => b.total - a.total);
+
+    const total = entries.reduce((sum, item) => sum + item.total, 0);
+
+    document.getElementById("workload-total").textContent =
+        `${total.toFixed(1)} h/Woche`;
+
+    const summary = document.getElementById("workload-summary");
+
+    if (total > 50) {
+        summary.innerHTML = `
+            <div class="card danger-card">
+                <strong>Sehr hohe Belastung</strong>
+                <div class="item-sub">
+                    Dein aktuell berechneter Workload liegt über 50 Stunden.
+                    Prüfe Prioritäten und geplante Lernzeiten.
+                </div>
+            </div>
+        `;
+    } else if (total > 40) {
+        summary.innerHTML = `
+            <div class="card warning">
+                <strong>Hohe Belastung</strong>
+                <div class="item-sub">
+                    Dein Workload liegt über einer typischen 40-Stunden-Woche.
+                </div>
+            </div>
+        `;
+    } else {
+        summary.innerHTML = `
+            <div class="card success-card">
+                <strong>${total.toFixed(1)} Stunden aktuell geplant</strong>
+                <div class="item-sub">
+                    Enthalten sind wöchentliche Termine, relevante offene
+                    Todos und aktive Klausurvorbereitung.
+                </div>
+            </div>
+        `;
+    }
+
+    document.getElementById("workload-cards").innerHTML =
+        entries.length
+        ? entries.map(item => {
+            const level =
+                item.total < 6 ? "green" :
+                item.total < 12 ? "amber" : "red";
+
+            return `
+                <article class="item"
+                         style="border-left:4px solid ${courseColor(item.course)}">
+                    <div class="item-main">
+                        <div class="item-content">
+                            <div class="item-title">${esc(item.course)}</div>
+                            <div class="item-sub">
+                                Veranstaltungen: ${item.sessions.toFixed(1)} h
+                                · Todos: ${item.todos.toFixed(1)} h
+                                · Klausur: ${item.exams.toFixed(1)} h
+                            </div>
+                        </div>
+
+                        <span class="badge ${level}">
+                            ${item.total.toFixed(1)} h
+                        </span>
+                    </div>
+                </article>
+            `;
+        }).join("")
+        : `<div class="empty">Noch keine Workload-Daten vorhanden.</div>`;
+
+    renderExams();
+    renderGradeOverview();
+}
+
+/* =========================================================
+   LÖSCHEN UND RÜCKGÄNGIG
+   ========================================================= */
+
+function deleteItem(listName, id, label) {
+    const list = state[listName];
+    if (!Array.isArray(list)) return;
+
+    const index = list.findIndex(item => item.id === id);
+    if (index < 0) return;
+
+    const removed = list[index];
+    list.splice(index, 1);
+
+    saveData();
+    renderAll();
+
+    showUndo(`${label} gelöscht`, () => {
+        list.splice(Math.min(index, list.length), 0, removed);
+        saveData();
+        renderAll();
+        showToast(`${label} wiederhergestellt`);
+    });
+}
+
+/* =========================================================
+   HEUTE-ANSICHT
+   ========================================================= */
+
+function renderToday() {
+    const container = document.getElementById("today-container");
+    const now = new Date();
+    const dayIndex = (now.getDay() + 6) % 7;
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const today = localDateKey();
+
+    const todaySessions = state.sessions
+        .filter(session => Number(session.day) === dayIndex)
+        .sort((a, b) => a.start.localeCompare(b.start));
+
+    const currentSession = todaySessions.find(session => {
+        const start = timeToMinutes(session.start);
+        const end = timeToMinutes(session.end);
+        return start <= nowMinutes && nowMinutes < end;
+    });
+
+    const nextSession = todaySessions.find(session => {
+        return timeToMinutes(session.start) > nowMinutes;
+    });
+
+    const overdue = state.todos
+        .filter(todo =>
+            !todo.done &&
+            todo.due &&
+            daysFromToday(todo.due) < 0
+        )
+        .sort((a, b) => a.due.localeCompare(b.due));
+
+    const dueToday = state.todos
+        .filter(todo => !todo.done && todo.due === today);
+
+    const todayAll = state.todos
+        .filter(todo => todo.due === today);
+
+    const todayDone = todayAll
+        .filter(todo => todo.done)
+        .length;
+
+    const progress = todayAll.length
+        ? Math.round((todayDone / todayAll.length) * 100)
+        : 100;
+
+    const upcomingExams = state.exams
+        .filter(exam => {
+            const days = daysFromToday(exam.date);
+            return days >= 0 && days <= 30;
+        })
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+    let html = "";
+
+    const standalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+    if (!standalone) {
+        html += `
+            <div class="card warning">
+                <strong>📲 Als App installieren</strong>
+                <div class="item-sub">
+                    In Safari: Teilen → „Zum Home-Bildschirm“.
+                </div>
+            </div>
+        `;
+    }
+
+    const lastBackup = Number(state.meta.lastBackupAt || 0);
+    const backupAge = lastBackup
+        ? Math.floor((Date.now() - lastBackup) / 86400000)
+        : null;
+
+    if (backupAge === null || backupAge >= 7) {
+        html += `
+            <div class="card warning">
+                <div class="row between">
+                    <div>
+                        <strong>💾 Backup empfohlen</strong>
+                        <div class="item-sub">
+                            ${backupAge === null
+                                ? "Es wurde noch kein Backup erstellt."
+                                : `Das letzte Backup ist ${backupAge} Tage alt.`}
+                        </div>
+                    </div>
+
+                    <button class="btn"
+                            type="button"
+                            onclick="exportBackup()">
+                        Sichern
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    html += `
+        <div class="card">
+            <div class="row between">
+                <div>
+                    <strong>
+                        ${new Intl.DateTimeFormat("de-DE", {
+                            weekday: "long",
+                            day: "2-digit",
+                            month: "long"
+                        }).format(now)}
+                    </strong>
+                    <div class="item-sub">
+                        ${todayDone} von ${todayAll.length} heute fälligen
+                        Todos erledigt
+                    </div>
+                </div>
+
+                <span class="badge blue">${progress} %</span>
+            </div>
+
+            <div class="progress">
+                <div style="width:${progress}%"></div>
+            </div>
+        </div>
+    `;
+
+    if (currentSession) {
+        html += `
+            <div class="card success-card">
+                <span class="badge green">● Läuft gerade</span>
+                <div class="item-title" style="font-size:17px;margin-top:8px">
+                    ${esc(currentSession.course)}
+                </div>
+                <div class="item-sub">
+                    ${esc(currentSession.type)}
+                    · bis ${esc(currentSession.end)}
+                    · ${esc(currentSession.room || "kein Raum")}
+                </div>
+            </div>
+        `;
+    } else if (nextSession) {
+        const minutesUntil =
+            timeToMinutes(nextSession.start) - nowMinutes;
+
+        html += `
+            <div class="card">
+                <span class="badge blue">
+                    Nächster Termin in ${minutesUntil} Min.
+                </span>
+                <div class="item-title" style="font-size:17px;margin-top:8px">
+                    ${esc(nextSession.course)}
+                </div>
+                <div class="item-sub">
+                    ${esc(nextSession.start)}–${esc(nextSession.end)}
+                    · ${esc(nextSession.room || "kein Raum")}
+                </div>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="card">
+                <strong>Keine weiteren Termine heute 🎉</strong>
+            </div>
+        `;
+    }
+
+    if (overdue.length) {
+        html += `
+            <div class="section-title danger">
+                Überfällig (${overdue.length})
+            </div>
+            ${overdue.map(todoCard).join("")}
+        `;
+    }
+
+    html += `
+        <div class="section-title">
+            Heute fällig (${dueToday.length})
+        </div>
+        ${dueToday.length
+            ? dueToday.map(todoCard).join("")
+            : '<div class="card"><div class="item-sub">Heute ist nichts mehr fällig.</div></div>'}
+    `;
+
+    if (upcomingExams.length) {
+        html += `
+            <div class="section-title">
+                Klausuren in den nächsten 30 Tagen
+            </div>
+            ${upcomingExams.map(examCard).join("")}
+        `;
+    }
+
+    container.innerHTML = html;
+}
+
+/* =========================================================
+   FOKUS-TIMER
+   ========================================================= */
+
+function timerRemainingSeconds() {
+    const timer = state.focus.timer;
+
+    if (timer.status === "running" && timer.endsAt) {
+        return Math.max(
+            0,
+            Math.ceil((timer.endsAt - Date.now()) / 1000)
+        );
+    }
+
+    return Math.max(
+        0,
+        Number(timer.remainingSec || timer.durationSec || 0)
+    );
+}
+
+function setTimerMode(minutes) {
+    const timer = state.focus.timer;
+
+    if (timer.status === "running") {
+        showToast("Timer zuerst pausieren oder zurücksetzen");
+        return;
+    }
+
+    const duration = Math.max(60, Math.round(minutes * 60));
+
+    timer.status = "idle";
+    timer.durationSec = duration;
+    timer.remainingSec = duration;
+    timer.endsAt = null;
+    timer.todoId = null;
+    timer.task = `${minutes} Minuten Fokus`;
+
+    saveData();
+    updateTimerDisplay();
+}
+
+function unlockAudio() {
+    try {
+        if (!audioContext) {
+            audioContext = new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+        }
+
+        if (audioContext.state === "suspended") {
+            audioContext.resume();
+        }
+    } catch (error) {
+        console.warn("Audio konnte nicht aktiviert werden:", error);
+    }
+}
+
+function toggleTimer() {
+    const timer = state.focus.timer;
+    unlockAudio();
+
+    if (timer.status === "running") {
+        timer.remainingSec = timerRemainingSeconds();
+        timer.status = "paused";
+        timer.endsAt = null;
+    } else {
+        const remaining = timerRemainingSeconds() ||
+                          timer.durationSec ||
+                          25 * 60;
+
+        timer.remainingSec = remaining;
+        timer.endsAt = Date.now() + remaining * 1000;
+        timer.status = "running";
+    }
+
+    saveData();
+    updateTimerDisplay();
+}
+
+function resetTimer() {
+    const timer = state.focus.timer;
+
+    timer.status = "idle";
+    timer.remainingSec = timer.durationSec || 25 * 60;
+    timer.endsAt = null;
+    timer.todoId = null;
+    timer.task = "Bereit für Fokus";
+
+    saveData();
+    updateTimerDisplay();
+}
+
+function startTodoFocus(id) {
+    const todo = state.todos.find(item => item.id === id);
+    if (!todo) return;
+
+    const duration = Math.max(60, todo.min * 60);
+
+    state.focus.timer = {
+        status: "idle",
+        durationSec: duration,
+        remainingSec: duration,
+        endsAt: null,
+        task: todo.title,
+        todoId: todo.id
+    };
+
+    saveData();
+    switchTab("focus");
+    updateTimerDisplay();
+}
+
+function playCompletionSound() {
+    try {
+        unlockAudio();
+
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(
+            660,
+            audioContext.currentTime
+        );
+
+        gain.gain.setValueAtTime(
+            0.18,
+            audioContext.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + 1.2
+        );
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 1.2);
+    } catch (error) {
+        console.warn("Ton konnte nicht abgespielt werden:", error);
+    }
+}
+
+function finishTimer() {
+    const timer = state.focus.timer;
+    if (timer.status !== "running") return;
+
+    const completedMinutes =
+        Math.max(1, Math.round(timer.durationSec / 60));
+
+    const today = localDateKey();
+
+    state.focus.log[today] =
+        Number(state.focus.log[today] || 0) + completedMinutes;
+
+    timer.status = "idle";
+    timer.remainingSec = timer.durationSec;
+    timer.endsAt = null;
+
+    playCompletionSound();
+    saveData();
+    renderAll();
+    showToast("🎉 Fokus-Session abgeschlossen");
+}
+
+function updateTimerDisplay() {
+    const timer = state.focus.timer;
+    let remaining = timerRemainingSeconds();
+
+    if (timer.status === "running" && remaining <= 0) {
+        finishTimer();
+        remaining = timerRemainingSeconds();
+    }
+
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+
+    document.getElementById("timer-display").textContent =
+        `${String(minutes).padStart(2, "0")}:` +
+        `${String(seconds).padStart(2, "0")}`;
+
+    document.getElementById("timer-task").textContent =
+        timer.task || "Bereit für Fokus";
+
+    const duration = Math.max(1, timer.durationSec || 1);
+    const progress = Math.min(
+        100,
+        Math.max(0, ((duration - remaining) / duration) * 100)
+    );
+
+    document.getElementById("timer-ring")
+        .style.setProperty("--progress", `${progress}%`);
+
+    const button = document.getElementById("timer-main-button");
+
+    button.textContent =
+        timer.status === "running"
+            ? "Pause"
+            : timer.status === "paused"
+                ? "Fortsetzen"
+                : "Starten";
+}
+
+function calculateStreak() {
+    const log = state.focus.log || {};
+    let date = localDateKey();
+    let count = 0;
+
+    if (Number(log[date] || 0) <= 0) {
+        date = shiftDate(date, -1);
+    }
+
+    while (Number(log[date] || 0) > 0) {
+        count += 1;
+        date = shiftDate(date, -1);
+    }
+
+    return count;
+}
+
+function calculateLongestStreak() {
+    const log = state.focus.log || {};
+
+    const activeDates = Object.keys(log)
+        .filter(date => Number(log[date] || 0) > 0)
+        .sort();
+
+    let longest = 0;
+    let current = 0;
+    let previousOrdinal = null;
+
+    activeDates.forEach(date => {
+        const ordinal = dateOrdinal(date);
+
+        if (previousOrdinal !== null && ordinal === previousOrdinal + 1) {
+            current += 1;
+        } else {
+            current = 1;
+        }
+
+        longest = Math.max(longest, current);
+        previousOrdinal = ordinal;
+    });
+
+    return longest;
+}
+
+function calculateFocusStats() {
+    const log = state.focus.log || {};
+    const today = localDateKey();
+
+    let weekTotal = 0;
+    let activeDays = 0;
+    let bestMinutes = 0;
+    let bestDateLabel = "–";
+
+    for (let offset = 6; offset >= 0; offset -= 1) {
+        const date = shiftDate(today, -offset);
+        const minutes = Number(log[date] || 0);
+
+        weekTotal += minutes;
+
+        if (minutes > 0) {
+            activeDays += 1;
+        }
+
+        if (minutes > bestMinutes) {
+            bestMinutes = minutes;
+            bestDateLabel = formatShortDate(date);
+        }
+    }
+
+    return {
+        weekTotal,
+        weekAverage: activeDays > 0 ? weekTotal / activeDays : 0,
+        bestMinutes,
+        bestDateLabel,
+        longestStreak: calculateLongestStreak()
+    };
+}
+
+function renderFocusStatistics() {
+    const today = localDateKey();
+    const values = [];
+
+    for (let offset = 6; offset >= 0; offset -= 1) {
+        const date = shiftDate(today, -offset);
+        const minutes = Number(state.focus.log[date] || 0);
+
+        const [y, m, d] = date.split("-").map(Number);
+        const dateObject = new Date(y, m - 1, d);
+
+        values.push({
+            date,
+            minutes,
+            label: new Intl.DateTimeFormat("de-DE", {
+                weekday: "short"
+            }).format(dateObject).slice(0, 2)
+        });
+    }
+
+    const maximum = Math.max(1, ...values.map(item => item.minutes));
+
+    document.getElementById("focus-chart").innerHTML =
+        values.map(item => {
+            const height = Math.max(
+                4,
+                Math.round((item.minutes / maximum) * 55)
+            );
+
+            return `
+                <div class="chart-col"
+                     title="${item.minutes} Minuten">
+                    <div class="chart-bar"
+                         style="height:${height}px"></div>
+                    <div class="chart-label">${esc(item.label)}</div>
+                </div>
+            `;
+        }).join("");
+
+    document.getElementById("focus-today").textContent =
+        `${Number(state.focus.log[today] || 0)} Min. heute`;
+
+    const streak = calculateStreak();
+
+    document.getElementById("streak-badge").textContent =
+        `🔥 ${streak} ${streak === 1 ? "Tag" : "Tage"}`;
+
+    const stats = calculateFocusStats();
+
+    document.getElementById("stat-week-total").textContent =
+        `${Math.round(stats.weekTotal)} Min.`;
+
+    document.getElementById("stat-week-avg").textContent =
+        `${Math.round(stats.weekAverage)} Min.`;
+
+    document.getElementById("stat-best-day").textContent =
+        stats.bestMinutes > 0
+            ? `${stats.bestMinutes} Min. (${stats.bestDateLabel})`
+            : "–";
+
+    document.getElementById("stat-longest-streak").textContent =
+        `${stats.longestStreak} ${stats.longestStreak === 1 ? "Tag" : "Tage"}`;
+
+    updateTimerDisplay();
+}
+
+/* =========================================================
+   IMPORT, BACKUP UND KALENDER
+   ========================================================= */
+
+async function shareOrDownload(blob, filename, title) {
+    const file = new File([blob], filename, {
+        type: blob.type
+    });
+
+    if (navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                files: [file],
+                title
+            });
+
+            return true;
+        } catch (error) {
+            if (error.name === "AbortError") return false;
+            console.warn("Teilen fehlgeschlagen:", error);
+        }
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    return true;
+}
+
+async function exportBackup() {
+    const timestamp = Date.now();
+
+    const exportData = JSON.parse(JSON.stringify(state));
+    exportData.meta.lastBackupAt = timestamp;
+
+    const blob = new Blob(
+        [JSON.stringify(exportData, null, 2)],
+        { type: "application/json;charset=utf-8" }
+    );
+
+    const success = await shareOrDownload(
+        blob,
+        `uniplan_backup_${localDateKey()}.json`,
+        "UniPlan-Backup"
+    );
+
+    if (success) {
+        state.meta.lastBackupAt = timestamp;
+        saveData();
+        renderToday();
+        showToast("Backup erstellt");
+    }
+}
+
+function importBackup() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json,application/json";
+
+    input.onchange = async event => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        try {
+            const text = await file.text();
+            const imported = JSON.parse(text);
+
+            if (!imported || typeof imported !== "object") {
+                throw new Error("Ungültige Daten");
+            }
+
+            const confirmed = await askUser(
+                "Backup importieren?",
+                "Der aktuelle Datenbestand wird durch die ausgewählte Datei ersetzt. Erstelle vorher bei Bedarf ein Backup.",
+                "Importieren",
+                "📥"
+            );
+
+            if (!confirmed) return;
+
+            state = normalizeData(imported);
+            saveData();
+            renderAll();
+            showToast("Backup erfolgreich importiert");
+        } catch (error) {
+            console.error(error);
+            showToast("Die Datei ist kein gültiges UniPlan-Backup");
+        }
+    };
+
+    input.click();
+}
+
+function escapeICS(value) {
+    return String(value || "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll(";", "\\;")
+        .replaceAll(",", "\\,")
+        .replace(/\r?\n/g, "\\n");
+}
+
+function formatICSLocal(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    const h = String(date.getHours()).padStart(2, "0");
+    const min = String(date.getMinutes()).padStart(2, "0");
+    const sec = String(date.getSeconds()).padStart(2, "0");
+
+    return `${y}${m}${d}T${h}${min}${sec}`;
+}
+
+function formatICSUTC(date) {
+    return date.toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}Z$/, "Z");
+}
+
+function nextSessionDate(session) {
+    const now = new Date();
+    const jsTargetDay = (Number(session.day) + 1) % 7;
+    let delta = (jsTargetDay - now.getDay() + 7) % 7;
+
+    const [hours, minutes] = session.start.split(":").map(Number);
+
+    const result = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + delta,
+        hours,
+        minutes,
+        0
+    );
+
+    if (result <= now) {
+        result.setDate(result.getDate() + 7);
+    }
+
+    return result;
+}
+
+async function exportICS() {
+    const lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "PRODID:-//UniPlan Pro//DE",
+        "X-WR-CALNAME:UniPlan"
+    ];
+
+    const stamp = formatICSUTC(new Date());
+
+    state.sessions.forEach(session => {
+        const start = nextSessionDate(session);
+        const duration =
+            timeToMinutes(session.end) -
+            timeToMinutes(session.start);
+
+        const end = new Date(start.getTime() + duration * 60000);
+
+        lines.push(
+            "BEGIN:VEVENT",
+            `UID:session-${session.id}@uniplan`,
+            `DTSTAMP:${stamp}`,
+            `DTSTART:${formatICSLocal(start)}`,
+            `DTEND:${formatICSLocal(end)}`,
+            "RRULE:FREQ=WEEKLY;COUNT=16",
+            `SUMMARY:${escapeICS(session.type + ": " + session.course)}`,
+            `LOCATION:${escapeICS(session.room)}`,
+            `DESCRIPTION:${escapeICS(session.lecturer || "")}`,
+            "BEGIN:VALARM",
+            "ACTION:DISPLAY",
+            "DESCRIPTION:UniPlan-Erinnerung",
+            "TRIGGER:-PT30M",
+            "END:VALARM",
+            "END:VEVENT"
+        );
+    });
+
+    state.exams.forEach(exam => {
+        if (!exam.date) return;
+
+        const [y, m, d] = exam.date.split("-").map(Number);
+        const [h, min] = (exam.time || "09:00").split(":").map(Number);
+
+        const start = new Date(y, m - 1, d, h, min, 0);
+        const end = new Date(start.getTime() + 120 * 60000);
+
+        lines.push(
+            "BEGIN:VEVENT",
+            `UID:exam-${exam.id}@uniplan`,
+            `DTSTAMP:${stamp}`,
+            `DTSTART:${formatICSLocal(start)}`,
+            `DTEND:${formatICSLocal(end)}`,
+            `SUMMARY:${escapeICS("Klausur: " + exam.course + " – " + exam.name)}`,
+            `LOCATION:${escapeICS(exam.room)}`,
+            "BEGIN:VALARM",
+            "ACTION:DISPLAY",
+            "DESCRIPTION:Klausur morgen",
+            "TRIGGER:-P1D",
+            "END:VALARM",
+            "BEGIN:VALARM",
+            "ACTION:DISPLAY",
+            "DESCRIPTION:Klausur in zwei Stunden",
+            "TRIGGER:-PT2H",
+            "END:VALARM",
+            "END:VEVENT"
+        );
+    });
+
+    state.todos
+        .filter(todo => !todo.done && todo.due)
+        .forEach(todo => {
+            const start = todo.due.replaceAll("-", "");
+            const end = shiftDate(todo.due, 1).replaceAll("-", "");
+
+            lines.push(
+                "BEGIN:VEVENT",
+                `UID:todo-${todo.id}@uniplan`,
+                `DTSTAMP:${stamp}`,
+                `DTSTART;VALUE=DATE:${start}`,
+                `DTEND;VALUE=DATE:${end}`,
+                `SUMMARY:${escapeICS("Abgabe: " + todo.title)}`,
+                `DESCRIPTION:${escapeICS(todo.notes || "")}`,
+                "BEGIN:VALARM",
+                "ACTION:DISPLAY",
+                "DESCRIPTION:Abgabe steht bevor",
+                "TRIGGER:-PT12H",
+                "END:VALARM",
+                "END:VEVENT"
+            );
+        });
+
+    lines.push("END:VCALENDAR");
+
+    const blob = new Blob(
+        [lines.join("\r\n")],
+        { type: "text/calendar;charset=utf-8" }
+    );
+
+    const success = await shareOrDownload(
+        blob,
+        `uniplan_kalender_${localDateKey()}.ics`,
+        "UniPlan-Kalender"
+    );
+
+    if (success) {
+        showToast("Kalenderdatei erstellt");
+    }
+}
+
+/* =========================================================
+   GESAMTANSICHT UND START
+   ========================================================= */
+
+function renderAll() {
+    renderSchedule();
+    renderTodos();
+    renderWorkload();
+    renderToday();
+    renderFocusStatistics();
+    refreshCourseList();
+    updateHeader();
+    updateNetworkStatus();
+}
+
+loadData();
+renderAll();
+updateTimerDisplay();
+
+setInterval(updateTimerDisplay, 500);
+
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+        updateTimerDisplay();
+        renderToday();
+    }
+});
+
+window.addEventListener("focus", () => {
+    updateTimerDisplay();
+    renderToday();
+});
+
+/* Service Worker registrieren */
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+        try {
+            await navigator.serviceWorker.register("./sw.js");
+        } catch (error) {
+            console.error("Service Worker konnte nicht registriert werden:", error);
+        }
+    });
+}
+</script>
+
+</body>
+</html>
